@@ -38,3 +38,73 @@ The repository is structured to test specific, high-risk cloud scenarios:
 ## ⚠️ Legal Disclaimer
 
 This lab is for **Educational and Authorized Security Testing Only**. Do not run these misconfiguration scripts against any production environment. The author assumes no liability for unauthorized use.
+
+---
+
+## 🎮 Complete Demo: Mission 1 (The Leaky Bucket)
+
+Follow these steps to simulate the full Attack & Defense lifecycle.
+
+### 🛑 Prerequisites
+1.  **AWS CLI** installed and configured with `aws configure`.
+2.  **Terraform** installed.
+3.  **Git** installed.
+
+### Phase 1: The Red Team (Deploy & Exploitation)
+First, we deploy the misconfigured infrastructure.
+
+```bash
+# 1. Navigate to the vulnerable config
+cd vulnerable-configs
+
+# 2. Initialize and Apply Terraform
+terraform init
+terraform apply -auto-approve
+```
+
+**The Exploitation:**
+Now that the bucket is live, we use our audit script to simulate an anonymous attacker trying to list the files.
+
+```bash
+# 3. Get the bucket name from Terraform output or AWS Console
+# 4. Run the audit script
+../scripts/audit_mission1.sh <YOUR_BUCKET_NAME>
+```
+
+**Expected Output:**
+> ❌ CRITICAL VULNERABILITY FOUND!
+> The bucket is Publicly Accessible.
+
+---
+
+### Phase 2: The Blue Team (Remediation)
+Now, we apply the secure configuration to patch the hole.
+
+```bash
+# 1. Navigate to the secure config
+cd ../secure-configs
+
+# 2. Apply the fix (Terraform will update the existing bucket)
+terraform init
+terraform apply -auto-approve
+```
+
+**Verify the Fix:**
+Run the audit script again to confirm the door is closed.
+
+```bash
+../scripts/audit_mission1.sh <YOUR_BUCKET_NAME>
+```
+
+**Expected Output:**
+> ✅ SECURE.
+> Access Denied for anonymous users.
+
+---
+
+### 🧹 Phase 3: Cleanup
+**CRITICAL:** Always destroy your resources to avoid cloud costs.
+
+```bash
+terraform destroy -auto-approve
+```
