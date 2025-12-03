@@ -108,3 +108,61 @@ Run the audit script again to confirm the door is closed.
 ```bash
 terraform destroy -auto-approve
 ```
+
+---
+
+## 🎮 Complete Demo: Mission 2 (IAM Privilege Escalation)
+
+This mission simulates an "Internal Threat" scenario where a low-level user exploits a permission flaw to become an Administrator.
+
+### Phase 1: The Red Team (Deploy & Exploit)
+
+**1. Deploy the Vulnerable User:**
+```bash
+cd vulnerable-configs/mission2
+terraform init
+terraform apply -auto-approve
+```
+
+**2. Capture the Credentials:**
+Terraform will output an Access Key and Secret Key. Copy them.
+
+> **Output Example:**
+> intern_access_key = "AKIA..."
+> intern_secret_key = "wJalr..."
+
+**3. Run the Exploit:**
+We will use the intern's keys to try to create an admin user.
+* **Attempt 1:** Fails (Access Denied).
+* **Exploit:** We abuse `iam:PutUserPolicy` to attach Admin rights to ourselves.
+* **Attempt 2:** Succeeds (We are now God).
+
+```bash
+# Usage: ./exploit.sh <ACCESS_KEY> <SECRET_KEY>
+../../scripts/mission2/exploit.sh AKIA... wJalr...
+```
+
+---
+
+### Phase 2: The Blue Team (Remediation)
+
+**1. Apply the Secure Configuration:**
+We remove the dangerous `PutUserPolicy` permission, enforcing Least Privilege.
+
+```bash
+cd ../../secure-configs/mission2
+terraform init
+terraform apply -auto-approve
+```
+
+**2. Verify the Fix:**
+If you try to run the exploit script again with the new keys, the privilege escalation step will fail.
+
+---
+
+### 🧹 Phase 3: Cleanup
+Destroys the IAM users to ensure no loose access keys are left behind.
+
+```bash
+terraform destroy -auto-approve
+```
