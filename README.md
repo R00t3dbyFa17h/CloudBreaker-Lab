@@ -135,7 +135,7 @@ Terraform will output an Access Key and Secret Key. Copy them.
 We will use the intern's keys to try to create an admin user.
 * **Attempt 1:** Fails (Access Denied).
 * **Exploit:** We abuse `iam:PutUserPolicy` to attach Admin rights to ourselves.
-* **Attempt 2:** Succeeds (We are now God).
+* **Attempt 2:** Succeeds (We are now admin).
 
 ```bash
 # Usage: ./exploit.sh <ACCESS_KEY> <SECRET_KEY>
